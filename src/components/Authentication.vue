@@ -2,17 +2,25 @@
   <div>
     <h1>{{formType}}</h1>
     <form v-on:submit="submitForm">
-      <input id="username" type="text" placeholder="Username">
-      <input id="password" type="password" placeholder="Password">
-      <input id="confirm-password" v-if="formType !== 'Login'" type="password" placeholder="Confirm Password">
+      <input v-model="username" type="text" placeholder="Username">
+      <input v-model="password" type="password" placeholder="Password">
+      <input v-model="confirmedPassword" v-if="formType !== 'Login'" type="password" placeholder="Confirm Password">
       <button>{{formType}}</button>
     </form>
   </div>
 </template>
 
 <script>
+import AuthenticationService from '@/services/AuthenticationService'
 export default {
   name: 'Authentication',
+  data () {
+    return {
+      username: '',
+      password: '',
+      confirmedPassword: ''
+    }
+  },
   props: {
     formType: {
       type: String,
@@ -20,7 +28,7 @@ export default {
     }
   },
   methods: {
-    submitForm: function (e) {
+    submitForm (e) {
       e.preventDefault()
       if (this.formType === 'Login') {
         return this.submitLogin()
@@ -28,23 +36,21 @@ export default {
         return this.submitSignUp()
       }
     },
-    submitLogin: function () {
+    submitLogin () {
       console.log('Submitting Login')
-      let username = document.querySelector('#username').value
-      let password = document.querySelector('#password').value
-      console.log(username)
-      console.log(password)
+      console.log(this.username)
+      console.log(this.password)
     },
-    submitSignUp: function () {
+    async submitSignUp () {
       console.log('Submitting Registration')
-      let username = document.querySelector('#username').value
-      let password = document.querySelector('#password').value
-      let confirmPassword = document.querySelector('#confirm-password').value
-      console.log(username)
-      console.log(password)
-      console.log(confirmPassword)
-      if (confirmPassword !== password) {
+      if (this.confirmedPassword !== this.password) {
         console.log('Passwords do not match')
+      } else {
+        const response = await AuthenticationService.register({
+          username: this.username,
+          password: this.password
+        })
+        console.log(response.data)
       }
     }
   }
