@@ -4,6 +4,23 @@ import Home from '@/components/Home'
 import Authentication from '@/components/Authentication'
 import MusicHome from '@/components/MusicHome'
 import NotFoundComponent from '@/components/NotFoundComponent'
+import {store} from '../store/index'
+
+const ifNotAuthenticated = (to, from, next) => {
+  if (!store.getters.isAuthenticated) {
+    next()
+    return
+  }
+  next('/music')
+}
+
+const ifAuthenticated = (to, from, next) => {
+  if (store.getters.isAuthenticated) {
+    next()
+    return
+  }
+  next('/login')
+}
 
 Vue.use(Router)
 
@@ -17,7 +34,8 @@ export default new Router({
     {
       path: '/login',
       component: Authentication,
-      props: {formType: 'Login'}
+      props: {formType: 'Login'},
+      beforeEnter: ifNotAuthenticated
     },
     {
       path: '/register',
@@ -25,7 +43,8 @@ export default new Router({
     },
     {
       path: '/music',
-      component: MusicHome
+      component: MusicHome,
+      beforeEnter: ifAuthenticated
     },
     {
       path: '*',

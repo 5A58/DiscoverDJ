@@ -11,7 +11,6 @@
 </template>
 
 <script>
-import AuthenticationService from '@/services/AuthenticationService'
 export default {
   name: 'Authentication',
   data () {
@@ -31,26 +30,24 @@ export default {
     submitForm (e) {
       e.preventDefault()
       if (this.formType === 'Login') {
-        return this.submitLogin()
-      } else {
-        return this.submitSignUp()
-      }
-    },
-    submitLogin () {
-      console.log('Submitting Login')
-      console.log(this.username)
-      console.log(this.password)
-    },
-    async submitSignUp () {
-      console.log('Submitting Registration')
-      if (this.confirmedPassword !== this.password) {
-        console.log('Passwords do not match')
-      } else {
-        const response = await AuthenticationService.register({
-          username: this.username,
-          password: this.password
+        this.$store.dispatch('login', { username: this.username, password: this.password }).then(resp => {
+          this.$router.push('/music')
+        }).catch(err => {
+          // Login failed
+          console.log(err)
         })
-        console.log(response.data)
+      } else {
+        if (this.password === this.confirmedPassword) {
+          this.$store.dispatch('register', { username: this.username, password: this.password }).then(resp => {
+            this.$router.push('/music')
+          }).catch(err => {
+            // registration failed
+            console.log(err)
+          })
+        } else {
+          // passwords do not match
+          console.log('Passwords do not match')
+        }
       }
     }
   }
