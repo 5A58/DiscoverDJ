@@ -1,17 +1,18 @@
 <template>
     <div v-if="pageOwned">
-      <p>{{ $route.params.username }}</p>
-      <p v-if="username">You are logged in as {{ username }}</p>
+      <p>Welcome to {{ $route.params.username }}'s Dojo</p>
       <p v-if="username === $route.params.username ">This is your page</p>
+      <SongContainer/>
     </div>
     <NotFoundComponent v-else></NotFoundComponent>
 </template>
 
 <script>
 import NotFoundComponent from './NotFoundComponent'
+import SongContainer from './SongContainer'
 export default {
   name: 'DJDashboard',
-  components: {NotFoundComponent},
+  components: {SongContainer, NotFoundComponent},
   data () {
     return {
       username: '',

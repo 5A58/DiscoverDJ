@@ -61,15 +61,6 @@ export default new Router({
     {
       path: '/music/:username',
       component: DJDashboard,
-      // props: async () => ({
-      //   pageOwned: await AuthenticationService.getUserID(this.params.username).then(resp => {
-      //     console.log('The page is owned by', resp.data)
-      //     return true
-      //   }).catch(err => {
-      //     console.log('The page owner does not exist', err)
-      //     return false
-      //   })
-      // })
       beforeEnter: pageOwnerExists
     },
     {

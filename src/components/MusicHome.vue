@@ -3,25 +3,21 @@
     <button v-if="$store.state.token" v-on:click="logout">Logout</button>
     <p v-if="username">Hello {{username}}</p>
     <h1>Music</h1>
-    <p v-for="song in songs" :key="song.id">{{song.artist ? song.artist + ' - ' : ''}} {{song.title}}</p>
+    <SongContainer/>
   </div>
 </template>
 
 <script>
-import SongService from '@/services/SongService'
+import SongContainer from './SongContainer'
 export default {
   name: 'MusicHome',
+  components: {SongContainer},
   data () {
     return {
-      songs: [],
       username: ''
     }
   },
   methods: {
-    async getSongs () {
-      const response = await SongService.getSongs()
-      this.songs = response.data
-    },
     logout () {
       this.$store.dispatch('logout').then(() => this.$router.push('/'))
     },
@@ -34,7 +30,6 @@ export default {
     }
   },
   mounted: function () {
-    this.getSongs()
     this.getUsername()
   }
 }
