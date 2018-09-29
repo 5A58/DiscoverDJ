@@ -1,5 +1,5 @@
 <template>
-    <div v-on:dblclick="doubleClick">
+    <div v-on:dblclick="songClicked(link)">
       {{artist ? artist + ' - ' : ''}} {{title}}
     </div>
 </template>
@@ -8,20 +8,10 @@
 export default {
   name: 'Song',
   props: {
-    title: {
-      type: String
-    },
-    artist: {
-      type: String
-    },
-    link: {
-      type: String
-    }
-  },
-  methods: {
-    doubleClick () {
-      console.log('Double Click')
-    }
+    title: String,
+    artist: String,
+    link: String,
+    songClicked: Function
   }
 }
 </script>
@@ -32,5 +22,8 @@ export default {
     background: #181818;
     margin: 0;
     border-bottom: 1px solid #282828;
+    -webkit-user-select: none; /* Chrome/Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
   }
 </style>

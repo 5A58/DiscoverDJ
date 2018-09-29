@@ -1,6 +1,7 @@
 <template>
     <div>
-      <Song v-for="song in songs" :key="song.id" v-bind:title="song.title" v-bind:artist="song.artist" v-bind:link="song.link"/>
+      <Song v-for="song in songs" :key="song.id" v-bind:title="song.title"
+            v-bind:artist="song.artist" v-bind:link="song.link" v-bind="{songClicked}"/>
     </div>
 </template>
 
@@ -12,8 +13,12 @@ export default {
   components: {Song},
   data () {
     return {
-      songs: []
+      songs: [],
+      data: 'Test'
     }
+  },
+  props: {
+    songClicked: Function
   },
   methods: {
     async getSongs () {
@@ -26,7 +31,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

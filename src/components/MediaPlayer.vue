@@ -10,7 +10,7 @@
       <youtube :video-id="videoId" :player-vars="playerVars" :height="height" :width="width" ref="youtube"/>
     </div>
 
-    <SongContainer/>
+    <SongContainer v-bind="{songClicked}"/>
 
     <PlayerControls v-bind="{playVideo, pauseVideo, stopVideo}"/>
   </div>
@@ -81,7 +81,8 @@ export default {
       })
     },
     songClicked (url) {
-      console.log('Load', url)
+      console.log('Now playing', url)
+      this.loadSong(url)
     }
   }
 }
