@@ -15,17 +15,23 @@
     "heroku-postbuild": "npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.4",
+    "@fortawesome/free-solid-svg-icons": "^5.3.1",
+    "@fortawesome/vue-fontawesome": "^0.1.1",
     "axios": "^0.18.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
+    "get-youtube-title": "^1.0.0",
     "mongoose": "^5.2.18",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
-    "vuex": "^3.0.1"
+    "vue-youtube": "^1.2.5",
+    "vuex": "^3.0.1",
+    "youtube-validate": "^1.2.4"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

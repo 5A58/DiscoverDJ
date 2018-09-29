@@ -3,15 +3,16 @@
     <button v-if="$store.state.token" v-on:click="logout">Logout</button>
     <p v-if="username">Hello {{username}}</p>
     <h1>Music</h1>
-    <SongContainer/>
+    <MediaPlayer/>
   </div>
 </template>
 
 <script>
 import SongContainer from './SongContainer'
+import MediaPlayer from './MediaPlayer'
 export default {
   name: 'MusicHome',
-  components: {SongContainer},
+  components: {MediaPlayer, SongContainer},
   data () {
     return {
       username: ''
