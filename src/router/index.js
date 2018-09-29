@@ -3,7 +3,9 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import Authentication from '@/components/Authentication'
 import MusicHome from '@/components/MusicHome'
+import DJDashboard from '@/components/DJDashboard'
 import NotFoundComponent from '@/components/NotFoundComponent'
+import AuthenticationService from '@/services/AuthenticationService'
 import {store} from '../store/index'
 
 const ifNotAuthenticated = (to, from, next) => {
@@ -14,13 +16,24 @@ const ifNotAuthenticated = (to, from, next) => {
   next('/music')
 }
 
-const ifAuthenticated = (to, from, next) => {
-  if (store.getters.isAuthenticated) {
+const pageOwnerExists = (to, from, next) => {
+  AuthenticationService.getUserID(to.params.username).then(resp => {
+    console.log('The page is owned by', resp.data)
     next()
-    return
-  }
-  next('/login')
+  }).catch(err => {
+    console.log('The page owner does not exist', err)
+    to.params.pageOwned = false
+    next()
+  })
 }
+
+// const ifAuthenticated = (to, from, next) => {
+//   if (store.getters.isAuthenticated) {
+//     next()
+//     return
+//   }
+//   next('/login')
+// }
 
 Vue.use(Router)
 
@@ -43,8 +56,21 @@ export default new Router({
     },
     {
       path: '/music',
-      component: MusicHome,
-      beforeEnter: ifAuthenticated
+      component: MusicHome
+    },
+    {
+      path: '/music/:username',
+      component: DJDashboard,
+      // props: async () => ({
+      //   pageOwned: await AuthenticationService.getUserID(this.params.username).then(resp => {
+      //     console.log('The page is owned by', resp.data)
+      //     return true
+      //   }).catch(err => {
+      //     console.log('The page owner does not exist', err)
+      //     return false
+      //   })
+      // })
+      beforeEnter: pageOwnerExists
     },
     {
       path: '*',

@@ -25,27 +25,54 @@ mongoose.connect(process.env.DB_URL, { useNewUrlParser: true }, () => {
 });
 
 // Routes
-app.get('/songs', (req, res) => {
-  console.log("Requesting Songs")
-  res.setHeader("Content-type", "application/json");
-  res.send(JSON.stringify([
-    {
-      "id": 1,
-      "title": "Song 1 from server"
-    },
-    {
-      "id": 2,
-      "title": "Song 2 from server"
+app.get("/songs", (req, res) => {
+  Song.find({}, (err, allSongs) => {
+    if(err) {
+      console.log(err);
+      res.status(400).send(err.message);
+    } else {
+      res.json(allSongs);
     }
-  ]));
+  });
 });
 
-app.get('/user/:id', (req, res) => {
+app.post('/songs', (req, res) => {
+  let title = req.body.title || 'Default Title';
+  let artist = req.body.artist || '';
+  let link = req.body.link;
+
+  // Add song to database
+  Song.create({title, artist, link}, (err, newSong) => {
+    if (err) {
+      console.log(err);
+      res.status(400).send(err.message);
+    } else {
+      // Send new object back
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(newSong));
+    }
+  });
+});
+
+app.get('/user/i/:id', (req, res) => {
   User.find({_id: req.params.id}, (err, user) => {
     if (user !== undefined && user.length > 0) {
       // User exists
       res.writeHead(200, {'Content-type': 'application/json'});
       res.end(JSON.stringify(user[0].username));
+    } else {
+      res.writeHead(404);
+      res.end();
+    }
+  });
+});
+
+app.get('/user/u/:username', (req, res) => {
+  User.find({username: req.params.username}, (err, user) => {
+    if (user !== undefined && user.length > 0) {
+      // User exists
+      res.writeHead(200, {'Content-type': 'application/json'});
+      res.end(JSON.stringify(user[0]._id));
     } else {
       res.writeHead(404);
       res.end();
@@ -72,7 +99,7 @@ app.post('/register', (req, res) => {
           } else {
             // Successful creation
             res.writeHead(200, {'Content-type': 'application/json'});
-            res.end(JSON.stringify(newUser._id));
+            res.end(JSON.stringify({id: newUser._id, username: newUser.username}));
           }
         });
       });
@@ -95,27 +122,13 @@ app.post('/login', (req, res) => {
         if(equivalent === true) {
           // Successful login, retrieve data for results page
           res.writeHead(200, {'Content-type': 'application/json'});
-          res.end(JSON.stringify(user[0]._id));
+          res.end(JSON.stringify({id: user[0]._id, username: user[0].username}));
         } else {
           // Incorrect password
           res.writeHead(401);
           res.end();
         }
       });
-    }
-  });
-});
-
-app.post('/songs', (req, res) => {
-  // Add song to database
-  Song.create(req.body, (err, newPost) => {
-    if (err) {
-      console.log(err);
-      res.status(400).send(err.message);
-    } else {
-      // Send new object back
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(newPost));
     }
   });
 });
