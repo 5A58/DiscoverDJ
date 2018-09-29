@@ -1,13 +1,17 @@
 <template>
     <div v-if="pageOwned">
       <p>Welcome to {{ $route.params.username }}'s Dojo</p>
-      <p v-if="username === $route.params.username ">This is your page</p>
-      <SongContainer/>
+      <div v-if="isOwner">
+        <p>This is your page</p>
+        <SongContainer/>
+      </div>
+      <button v-on:click="emitEvent">Emit Event</button>
     </div>
     <NotFoundComponent v-else></NotFoundComponent>
 </template>
 
 <script>
+import io from 'socket.io-client'
 import NotFoundComponent from './NotFoundComponent'
 import SongContainer from './SongContainer'
 export default {
@@ -16,7 +20,13 @@ export default {
   data () {
     return {
       username: '',
-      pageOwned: true
+      pageOwned: true,
+      socket: window.location.hostname === 'localhost' ? io('localhost:5000') : io(window.location.hostname)
+    }
+  },
+  computed: {
+    isOwner: function () {
+      return this.username === this.$route.params.username
     }
   },
   methods: {
@@ -29,13 +39,22 @@ export default {
           console.log('You are not logged in')
         }
       })
+    },
+    emitEvent () {
+      console.log('Clicked')
+      this.socket.emit('click', {room: this.$route.params.username, payload: 'Click message'})
     }
   },
   mounted: function () {
-    this.getUsername()
     if (typeof this.$route.params.pageOwned !== 'undefined') {
       this.pageOwned = this.$route.params.pageOwned
+    } else {
+      this.socket.emit('joinroom', this.$route.params.username)
     }
+    this.getUsername()
+    this.socket.on('click', (data) => {
+      console.log(`Received message from server saying '${data}'`)
+    })
   }
 }
 </script>

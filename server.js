@@ -2,6 +2,8 @@ let express = require('express'),
     bodyParser = require('body-parser'),
     cors = require('cors'),
     mongoose = require("mongoose"),
+    socketIO  = require("socket.io"),
+    http = require("http"),
     Song = require("./models/song"),
     User = require("./models/user"),
     path = require('path'),
@@ -22,6 +24,31 @@ const saltRounds = 10;
 // Connect to mongoDB
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true }, () => {
   console.log("Connected to mongoDB");
+});
+
+// Server instance
+const server = http.createServer(app);
+// Create socket using instance of server
+const io = socketIO(server);
+
+// Socket connection handler
+io.on("connection", (socket) => {
+  console.log(socket.id + " Connected");
+
+  socket.on('joinroom', (room) => {
+    console.log(socket.id + ` is joining ${room}'s room`);
+    socket.join(room);
+  });
+
+  socket.on('click', (data) => {
+    console.log(socket.id + ` sent '${data.payload}' on click`);
+    socket.to(data.room).emit('click', `Message from ${socket.id}`);
+  })
+
+
+  socket.on('disconnect', () => {
+    console.log(socket.id + " Disconnected");
+  });
 });
 
 // Routes
@@ -139,6 +166,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + "/dist/index.html"));
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on port ${port}...`);
 });
