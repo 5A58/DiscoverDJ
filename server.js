@@ -64,7 +64,7 @@ app.get("/songs", (req, res) => {
 });
 
 app.post('/songs', (req, res) => {
-  let title = req.body.title || 'Default Title';
+  let title = req.body.title;
   let artist = req.body.artist || '';
   let link = req.body.link;
 

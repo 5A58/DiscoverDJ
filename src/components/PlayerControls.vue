@@ -26,14 +26,14 @@ export default {
   }
 
   .control {
-    color: gray;
+    color: #b3b3b3;
     font-size: 1.5em;
   }
 
   .control:hover {
-   color: black;
+   color: #ffffff;
   }
   .control:active {
-   color:purple;
+   color: #535353;
   }
 </style>
