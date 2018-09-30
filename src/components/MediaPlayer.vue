@@ -12,8 +12,8 @@
 
     <SongContainer v-if="ownPage" v-bind="{songClicked}"/>
 
-    <PlayerControls v-if="ownPage" v-bind="{playVideo, pauseVideo}"/>
-    <PlayerControls v-else />
+    <PlayerControls v-if="ownPage" ref="controls" v-bind="{playVideo, pauseVideo}"/>
+    <PlayerControls v-else ref="controls"/>
   </div>
 
 </template>
@@ -35,7 +35,7 @@ export default {
       width: 400,
       videoId: '',
       videoURL: '',
-      playerVars: {'autoplay': 1, }
+      playerVars: {'autoplay': 1, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'showinfo': 0}
     }
   },
   props: {
@@ -73,8 +73,10 @@ export default {
         this.title = resp
         if (state !== 1) {
           this.player.cueVideoById(id, time)
+          this.$refs['controls'].changeButtonState('pause')
         } else {
           this.player.cueVideoById(id, time)
+          this.$refs['controls'].changeButtonState('play')
           this.playVideo()
         }
       }).catch(err => {
