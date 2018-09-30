@@ -1,12 +1,12 @@
 <template>
     <div v-if="pageOwned">
-      <p>Welcome to {{ $route.params.username }}'s Dojo</p>
+      <p v-if="isOwner">Welcome Home</p>
+      <p v-else>Welcome to {{ $route.params.username }}'s Dojo</p>
       <div v-if="isOwner">
-        <p>This is your page</p>
-        <MediaPlayer ref="player"/>
+        <MediaPlayer ref="player" v-bind="{sendUpdates}" v-bind:DJPage="true"/>
       </div>
       <div v-else>
-        <MediaPlayer ref="player" v-bind:ownPage="false" />
+        <MediaPlayer ref="player" v-bind:ownPage="false" v-bind:DJPage="true"/>
       </div>
     </div>
     <NotFoundComponent v-else></NotFoundComponent>
@@ -48,6 +48,19 @@ export default {
       let state = await data[0]
       let time = await data[1]
       return {state, time, url: data[2]}
+    },
+    sendUpdates (state, url, time) {
+      this.getPlayerInfo().then(resp => {
+        resp.state = state
+        let newUrl = url || resp.url
+        resp.url = newUrl
+        let newTime = time === 0 ? 0 : resp.time
+        resp.time = newTime
+        let room = this.$route.params.username || null
+        this.socket.emit('updateAll', Object.assign({room}, resp))
+      }).catch(err => {
+        console.log(err)
+      })
     }
   },
   mounted: function () {
@@ -57,10 +70,6 @@ export default {
       this.socket.emit('joinroom', this.$route.params.username)
     }
     this.getUsername()
-
-    this.socket.on('click', (data) => {
-      console.log(`Received message from server saying '${data}'`)
-    })
 
     this.socket.on('newMember', (socketID) => {
       if (this.isOwner) {
@@ -75,7 +84,14 @@ export default {
 
     this.socket.on('updatePlayer', (data) => {
       console.log('Received update', data)
-      this.$refs['player'].loadSong(data.url, data.time + 2, data.state)
+      let time
+      if (data.state === 1) {
+        // Adjust for latency
+        time = data.time + 1
+      } else {
+        time = data.time
+      }
+      this.$refs['player'].loadSong(data.url, time, data.state)
     })
   }
 }

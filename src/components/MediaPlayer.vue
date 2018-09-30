@@ -12,8 +12,8 @@
 
     <SongContainer v-if="ownPage" v-bind="{songClicked}"/>
 
-    <PlayerControls v-if="ownPage" ref="controls" v-bind="{playVideo, pauseVideo}"/>
-    <PlayerControls v-else ref="controls"/>
+    <PlayerControls v-if="ownPage" ref="controls"  v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates}"/>
+    <PlayerControls v-else ref="controls" v-bind:paused="playerPaused" v-bind:disabled="true"/>
   </div>
 
 </template>
@@ -35,6 +35,7 @@ export default {
       width: 400,
       videoId: '',
       videoURL: '',
+      playerPaused: true,
       playerVars: {'autoplay': 1, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'showinfo': 0}
     }
   },
@@ -42,6 +43,16 @@ export default {
     ownPage: {
       type: Boolean,
       default: true
+    },
+    sendUpdates: {
+      type: Function,
+      default: () => {
+        return null
+      }
+    },
+    DJPage: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -51,9 +62,11 @@ export default {
   },
   methods: {
     playVideo () {
+      this.playerPaused = false
       this.player.playVideo()
     },
     pauseVideo () {
+      this.playerPaused = true
       this.player.pauseVideo()
     },
     getId (url) {
@@ -64,24 +77,57 @@ export default {
       this.loadSong(this.songLink)
     },
     async loadSong (url, time = 0, state = 1) {
+      this.playerPaused = true
+      console.log('Loading Song')
       let id = this.getId(url)
       if (id === null) return
-      this.getTitle(id).then(resp => {
-        console.log('The title is', resp)
-        this.videoURL = url
-        this.videoId = id
-        this.title = resp
-        if (state !== 1) {
-          this.player.cueVideoById(id, time)
-          this.$refs['controls'].changeButtonState('pause')
-        } else {
-          this.player.cueVideoById(id, time)
-          this.$refs['controls'].changeButtonState('play')
-          this.playVideo()
-        }
-      }).catch(err => {
-        console.log('Video not found', err)
-      })
+      if (this.DJPage && this.ownPage) {
+        this.sendUpdates(state, url, time)
+      }
+      // Check if this song is already playing, if it is don't reload, just change state
+      if (this.videoURL === url) {
+        console.log('Already Loaded')
+        // Song already loaded, check if time changed
+        this.player.getCurrentTime().then(resp => {
+          if (Math.abs(time - resp) < 5) {
+            // Time is slightly off, perhaps due to latency, so just change state to reduce choppiness
+            if (state === 1) {
+              this.playVideo()
+            } else {
+              this.pauseVideo()
+            }
+          } else {
+            // Time has been changed
+            if (state === 1) {
+              this.player.seekTo(time, true)
+              this.playVideo()
+            } else {
+              this.player.seekTo(time, true)
+              this.pauseVideo()
+            }
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      } else {
+        // Load song
+        this.getTitle(id).then(resp => {
+          console.log('The title is', resp)
+          this.videoURL = url
+          this.videoId = id
+          this.title = resp
+          if (state !== 1) {
+            this.player.cueVideoById(id, time)
+            this.playerPaused = true
+          } else {
+            this.player.cueVideoById(id, time)
+            this.playerPaused = false
+            this.playVideo()
+          }
+        }).catch(err => {
+          console.log('Video not found', err)
+        })
+      }
     },
     getTitle (vid) {
       return new Promise((resolve, reject) => {

@@ -1,39 +1,41 @@
 <template>
   <div id="container">
-    <a class="control" @click="handleClick">
-      <font-awesome-icon id="play-icon" v-if="paused" icon="play"/>
+    <a v-if="!disabled" class="control" @click="handleClick">
+      <font-awesome-icon class="play-icon" v-if="paused" icon="play"/>
       <font-awesome-icon v-else icon="pause"/>
     </a>
+    <a v-else class="control-disabled">
+      <font-awesome-icon class="play-icon" v-if="paused" icon="play"/>
+      <font-awesome-icon v-else icon="pause"/>
+    </a>
+
   </div>
 </template>
 
 <script>
 export default {
   name: 'PlayerControls',
-  data () {
-    return {
-      paused: true
-    }
-  },
   props: {
     playVideo: Function,
-    pauseVideo: Function
+    pauseVideo: Function,
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    sendUpdates: Function,
+    paused: {
+      type: Boolean,
+      default: true
+    }
   },
   methods: {
     handleClick () {
       if (this.paused) {
-        this.changeButtonState('play')
-        return this.playVideo()
+        this.playVideo()
+        this.sendUpdates(1)
       } else {
-        this.changeButtonState('pause')
-        return this.pauseVideo()
-      }
-    },
-    changeButtonState (state = '') {
-      if (state === 'play') {
-        this.paused = false
-      } else if (state === 'pause') {
-        this.paused = true
+        this.pauseVideo()
+        this.sendUpdates(2)
       }
     }
   }
@@ -43,7 +45,6 @@ export default {
 <style scoped>
   #container {
     margin-top: 0.5em;
-    /*background: #282828;*/
     padding: 0.3rem 0;
     height: 1.75rem;
     width: 100%;
@@ -53,12 +54,17 @@ export default {
     left: 0pt;
   }
 
-  .control svg {
+  .control svg, .control-disabled svg {
     height: 0.7em;
     width: 0.7em;
     border: 1px solid #b3b3b3;
     padding: 0.5em;
     border-radius: 50%;
+  }
+
+  .control-disabled svg {
+    color: #535353;
+    border: 1px solid #535353;
   }
 
   .control {
@@ -78,10 +84,10 @@ export default {
   }
 
   .control svg:active {
-    border: 1px solid #535353;;
+    border: 1px solid #535353;
   }
 
-  #play-icon {
+  .play-icon {
     padding-left: 0.6em;
     padding-right: 0.4em;
   }
