@@ -2,7 +2,6 @@
   <div id="container">
     <a class="control" @click="playVideo"><font-awesome-icon icon="play"/></a>
     <a class="control" @click="pauseVideo"><font-awesome-icon icon="pause"/></a>
-    <a class="control" @click="stopVideo"><font-awesome-icon icon="stop"/></a>
   </div>
 </template>
 

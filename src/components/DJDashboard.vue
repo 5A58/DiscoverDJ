@@ -3,9 +3,11 @@
       <p>Welcome to {{ $route.params.username }}'s Dojo</p>
       <div v-if="isOwner">
         <p>This is your page</p>
-        <SongContainer/>
+        <MediaPlayer ref="player"/>
       </div>
-      <button v-on:click="emitEvent">Emit Event</button>
+      <div v-else>
+        <MediaPlayer ref="player" v-bind:ownPage="false" />
+      </div>
     </div>
     <NotFoundComponent v-else></NotFoundComponent>
 </template>
@@ -14,9 +16,10 @@
 import io from 'socket.io-client'
 import NotFoundComponent from './NotFoundComponent'
 import SongContainer from './SongContainer'
+import MediaPlayer from './MediaPlayer'
 export default {
   name: 'DJDashboard',
-  components: {SongContainer, NotFoundComponent},
+  components: {MediaPlayer, SongContainer, NotFoundComponent},
   data () {
     return {
       username: '',
@@ -40,9 +43,11 @@ export default {
         }
       })
     },
-    emitEvent () {
-      console.log('Clicked')
-      this.socket.emit('click', {room: this.$route.params.username, payload: 'Click message'})
+    async getPlayerInfo () {
+      let data = this.$refs['player'].getPlayerInfo()
+      let state = await data[0]
+      let time = await data[1]
+      return {state, time, url: data[2]}
     }
   },
   mounted: function () {
@@ -52,8 +57,25 @@ export default {
       this.socket.emit('joinroom', this.$route.params.username)
     }
     this.getUsername()
+
     this.socket.on('click', (data) => {
       console.log(`Received message from server saying '${data}'`)
+    })
+
+    this.socket.on('newMember', (socketID) => {
+      if (this.isOwner) {
+        this.getPlayerInfo().then(resp => {
+          this.socket.emit('updateSinglePlayer', Object.assign({client: socketID}, resp))
+        }).catch(err => {
+          console.log(err)
+        })
+        console.log(`${socketID} has joined the room`)
+      }
+    })
+
+    this.socket.on('updatePlayer', (data) => {
+      console.log('Received update', data)
+      this.$refs['player'].loadSong(data.url, data.time + 2, data.state)
     })
   }
 }

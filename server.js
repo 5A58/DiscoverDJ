@@ -38,6 +38,7 @@ io.on("connection", (socket) => {
   socket.on('joinroom', (room) => {
     console.log(socket.id + ` is joining ${room}'s room`);
     socket.join(room);
+    socket.to(room).emit('newMember', socket.id);
   });
 
   socket.on('click', (data) => {
@@ -45,6 +46,10 @@ io.on("connection", (socket) => {
     socket.to(data.room).emit('click', `Message from ${socket.id}`);
   })
 
+  socket.on('updateSinglePlayer', (data) => {
+    console.log(socket.id + ` sending state:${data.state}, time:${data.time}, url:${data.url} to ${data.client}`)
+    socket.to(data.client).emit('updatePlayer', {state: data.state, time: data.time, url: data.url});
+  })
 
   socket.on('disconnect', () => {
     console.log(socket.id + " Disconnected");

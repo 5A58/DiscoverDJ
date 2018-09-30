@@ -1,18 +1,19 @@
 <template>
   <div>
     <p v-if="videoId">Now Playing: {{title}}</p>
-    <form v-on:submit="submitForm">
+    <form v-if="ownPage" v-on:submit="submitForm">
       <input v-model="songLink" type="text">
       <button>Submit</button>
     </form>
 
     <div id="video-container">
-      <youtube :video-id="videoId" :player-vars="playerVars" :height="height" :width="width" ref="youtube"/>
+      <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube"/>
     </div>
 
-    <SongContainer v-bind="{songClicked}"/>
+    <SongContainer v-if="ownPage" v-bind="{songClicked}"/>
 
-    <PlayerControls v-bind="{playVideo, pauseVideo, stopVideo}"/>
+    <PlayerControls v-if="ownPage" v-bind="{playVideo, pauseVideo}"/>
+    <PlayerControls v-else />
   </div>
 
 </template>
@@ -30,10 +31,17 @@ export default {
     return {
       songLink: '',
       title: '',
-      height: 1,
-      width: 1,
+      height: 400,
+      width: 400,
       videoId: '',
-      playerVars: {'autoplay': 1, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'showinfo': 0}
+      videoURL: '',
+      playerVars: {'autoplay': 1, }
+    }
+  },
+  props: {
+    ownPage: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {
@@ -48,9 +56,6 @@ export default {
     pauseVideo () {
       this.player.pauseVideo()
     },
-    stopVideo () {
-      this.player.stopVideo()
-    },
     getId (url) {
       return this.$youtube.getIdFromUrl(url)
     },
@@ -58,13 +63,20 @@ export default {
       e.preventDefault()
       this.loadSong(this.songLink)
     },
-    async loadSong (url) {
+    async loadSong (url, time = 0, state = 1) {
       let id = this.getId(url)
       if (id === null) return
       this.getTitle(id).then(resp => {
         console.log('The title is', resp)
+        this.videoURL = url
         this.videoId = id
         this.title = resp
+        if (state !== 1) {
+          this.player.cueVideoById(id, time)
+        } else {
+          this.player.cueVideoById(id, time)
+          this.playVideo()
+        }
       }).catch(err => {
         console.log('Video not found', err)
       })
@@ -83,6 +95,9 @@ export default {
     songClicked (url) {
       console.log('Now playing', url)
       this.loadSong(url)
+    },
+    getPlayerInfo () {
+      return [this.player.getPlayerState(), this.player.getCurrentTime(), this.videoURL]
     }
   }
 }
@@ -90,6 +105,6 @@ export default {
 
 <style scoped>
   #video-container {
-    display: none;
+    /*display: none;*/
   }
 </style>
