@@ -1,5 +1,5 @@
 <template>
-    <div v-on:dblclick="songClicked(link)" @click.ctrl="addToQueue(title, artist, link)">
+    <div v-on:dblclick="songClicked(link)" @click.ctrl="addSongToQueue(title, artist, link)">
       {{artist ? artist + ' - ' : ''}} {{title}}
     </div>
 </template>
@@ -11,12 +11,8 @@ export default {
     title: String,
     artist: String,
     link: String,
-    songClicked: Function
-  },
-  methods: {
-    addToQueue: (key, title, artist, link) => {
-      console.log(`Add to queue ${title} ${artist} ${link}`)
-    }
+    songClicked: Function,
+    addSongToQueue: Function
   }
 }
 </script>

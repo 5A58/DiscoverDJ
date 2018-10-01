@@ -1,6 +1,6 @@
 <template>
   <div id="container">
-    <a v-if="!disabled" id="control" @click="handleClick">
+    <a v-if="!disabled" class="control" @click="handleClickPlay">
       <font-awesome-icon id="play-icon" v-if="paused" icon="play"/>
       <font-awesome-icon v-else icon="pause"/>
     </a>
@@ -8,7 +8,12 @@
       <font-awesome-icon id="play-icon" v-if="paused" icon="play"/>
       <font-awesome-icon v-else icon="pause"/>
     </a>
-
+    <a v-if="!disabled" class="vertical-center" @click="skipSong">
+      <font-awesome-icon class="control" icon="fast-forward"/>
+    </a>
+    <a v-else id="ff-disabled" class="vertical-center">
+      <font-awesome-icon icon="fast-forward"/>
+    </a>
   </div>
 </template>
 
@@ -26,10 +31,11 @@ export default {
     paused: {
       type: Boolean,
       default: true
-    }
+    },
+    skipSong: Function
   },
   methods: {
-    handleClick () {
+    handleClickPlay () {
       if (this.paused) {
         this.playVideo()
         this.sendUpdates(1)
@@ -59,7 +65,7 @@ export default {
     left: 0pt;
   }
 
-  #control svg, #control-disabled svg {
+  .control svg, #control-disabled svg {
     height: 0.7rem;
     width: 0.7rem;
     border: 1px solid #b3b3b3;
@@ -72,28 +78,38 @@ export default {
     border: 1px solid #535353;
   }
 
-  #control {
-    color: #b3b3b3;
-  }
-
-  #control:hover {
-    color: #ffffff;
-  }
-
-  #control svg:hover {
-    border: 1px solid #ffffff;
-  }
-
-  #control:active {
+  #ff-disabled {
     color: #535353;
   }
 
-  #control svg:active {
+  .control {
+    color: #b3b3b3;
+  }
+
+  .control:hover {
+    color: #ffffff;
+  }
+
+  .control svg:hover {
+    border: 1px solid #ffffff;
+  }
+
+  .control:active {
+    color: #535353;
+  }
+
+  .control svg:active {
     border: 1px solid #535353;
   }
 
   #play-icon {
     padding-left: 0.6rem;
     padding-right: 0.4rem;
+  }
+
+  .vertical-center {
+    position: absolute;
+    top: 20%;
+    margin-left: 1rem;
   }
 </style>

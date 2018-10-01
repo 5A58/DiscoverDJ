@@ -3,7 +3,9 @@
     <p id="queue-title">Song Queue</p>
     <p class="empty-queue" v-if="songs.length === 0">The song queue is empty...</p>
     <p class="empty-queue" v-if="songs.length === 0">Ctrl+Click a song to add it to queue</p>
-    <div class="queued-song" v-for="song in songs" :key="song.link">{{song.title.length > 25 ? song.title.substring(0,22) + '...' : song.title}}</div>
+    <div class="queued-song" v-for="song in songs" :key="song.link" @click.ctrl="removeSelf(song.link)">
+      {{song.title.length > 25 ? song.title.substring(0,22) + '...' : song.title}}
+    </div>
   </div>
 </template>
 
@@ -12,18 +14,23 @@ export default {
   name: 'SongQueue',
   data () {
     return {
-      songs: [
-        {title: 'Smoke on the Water', artist: 'Deep Purple', link: 'https://www.youtube.com/watch?v=zUwEIt9ez7M'},
-        {title: 'Stairway To Heaven', artist: 'Led Zeppelin', link: 'https://www.youtube.com/watch?v=D9ioyEvdggk'}
-      ]
+      songs: []
     }
   },
   methods: {
     getNext () {
-      return this.songs.shift()
+      if (this.songs.length !== 0) {
+        return this.songs.shift()
+      }
     },
     addSongToQueue (title, artist, link) {
       this.songs.push({title, artist, link})
+    },
+    removeSelf (link) {
+      const index = this.songs.map(song => song.link).indexOf(link)
+      if (index > -1) {
+        this.songs.splice(index, 1)
+      }
     }
   }
 }

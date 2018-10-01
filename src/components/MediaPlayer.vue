@@ -7,12 +7,12 @@
     </form>
 
     <div id="video-container">
-      <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube"/>
+      <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube" @ended="videoEnded()"/>
     </div>
 
-    <SongContainer v-if="ownPage" v-bind="{songClicked}"/>
+    <SongContainer v-if="ownPage" v-bind="{songClicked, addSongToQueue}"/>
 
-    <PlayerControls v-if="ownPage" ref="controls" v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates}"/>
+    <PlayerControls v-if="ownPage" ref="controls" v-bind:disabled="nothingLoaded" v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates, skipSong}"/>
     <PlayerControls v-else ref="controls" v-bind:paused="playerPaused" v-bind:disabled="true"/>
 
     <SongQueue v-if="ownPage" ref="queue"/>
@@ -21,7 +21,6 @@
 </template>
 
 <script>
-// import {validateUrl} from 'youtube-validate'
 import getYoutubeTitle from 'get-youtube-title'
 import PlayerControls from './PlayerControls'
 import SongContainer from './SongContainer'
@@ -39,6 +38,7 @@ export default {
       videoId: '',
       videoURL: '',
       playerPaused: true,
+      nothingLoaded: true,
       playerVars: {'autoplay': 1, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'showinfo': 0}
     }
   },
@@ -80,6 +80,7 @@ export default {
       this.loadSong(this.songLink)
     },
     async loadSong (url, time = 0, state = 1) {
+      this.nothingLoaded = false
       this.playerPaused = true
       console.log('Loading Song')
       let id = this.getId(url)
@@ -149,6 +150,27 @@ export default {
     },
     getPlayerInfo () {
       return [this.player.getPlayerState(), this.player.getCurrentTime(), this.videoURL]
+    },
+    videoEnded () {
+      let nextSong = this.$refs['queue'].getNext()
+      if (nextSong) {
+        console.log(`The next song is ${nextSong.link}`)
+        this.loadSong(nextSong.link)
+      } else {
+        console.log('The song queue is empty')
+        this.nothingLoaded = true
+      }
+    },
+    addSongToQueue (title, artist, link) {
+      this.$refs['queue'].addSongToQueue(title, artist, link)
+      if (this.nothingLoaded) {
+        this.videoEnded()
+      }
+    },
+    skipSong () {
+      this.player.stopVideo()
+      this.playerPaused = true
+      this.videoEnded()
     }
   }
 }

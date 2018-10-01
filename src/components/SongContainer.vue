@@ -1,7 +1,7 @@
 <template>
     <div id="song-container">
       <Song v-for="song in songs" :key="song.id" v-bind:title="song.title"
-            v-bind:artist="song.artist" v-bind:link="song.link" v-bind="{songClicked}"/>
+            v-bind:artist="song.artist" v-bind:link="song.link" v-bind="{songClicked, addSongToQueue}"/>
     </div>
 </template>
 
@@ -34,7 +34,8 @@ export default {
     }
   },
   props: {
-    songClicked: Function
+    songClicked: Function,
+    addSongToQueue: Function
   },
   methods: {
     async getSongs () {

@@ -17,11 +17,11 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    background: black;
+    background: #181818;
     color: white;
   }
   body {
-    background: black;
+    background: #181818;
     color: white;
     padding-bottom: 2.05rem;
   }
