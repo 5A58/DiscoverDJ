@@ -1,20 +1,21 @@
 <template>
-  <div>
-    <p v-if="videoId">Now Playing: {{title}}</p>
-    <form v-if="ownPage" v-on:submit="submitForm">
-      <input v-model="songLink" type="text">
-      <button>Submit</button>
-    </form>
+  <div id="player-container">
+    <div id="player-details">
+      <p v-if="videoId">Now Playing: {{title}}</p>
+      <form v-if="ownPage" v-on:submit="submitForm">
+        <input v-model="songLink" type="text">
+        <button>Submit</button>
+      </form>
 
-    <div id="video-container">
-      <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube" @ended="videoEnded()"/>
+      <div id="video-container">
+        <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube" @ended="videoEnded()"/>
+      </div>
     </div>
 
-    <SongContainer v-if="ownPage" v-bind="{songClicked, addSongToQueue}"/>
+    <SongContainer v-if="ownPage" v-bind:isAdmin="isAdmin" v-bind="{songClicked, addSongToQueue}"/>
 
     <PlayerControls v-if="ownPage" ref="controls" v-bind:disabled="nothingLoaded" v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates, skipSong}"/>
     <PlayerControls v-else ref="controls" v-bind:paused="playerPaused" v-bind:disabled="true"/>
-
     <SongQueue v-if="ownPage" ref="queue"/>
   </div>
 
@@ -60,6 +61,10 @@ export default {
       }
     },
     DJPage: {
+      type: Boolean,
+      default: false
+    },
+    isAdmin: {
       type: Boolean,
       default: false
     }
@@ -193,4 +198,10 @@ export default {
   #video-container {
     /*display: none;*/
   }
+
+  #player-details {
+    width: 80%;
+    margin: auto 0 auto auto;
+  }
+
 </style>

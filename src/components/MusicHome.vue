@@ -1,11 +1,13 @@
 <template>
   <div>
-    <button v-if="$store.state.token" v-on:click="logout">Logout</button>
-    <p v-if="username">Hello {{username}}</p>
-    <h1>Music</h1>
-    <button @click="toggleAddSong">Add Song</button>
-    <NewSong v-if="addSong"/>
-    <MediaPlayer/>
+    <div class="main-contents">
+      <button v-if="$store.state.token" v-on:click="logout">Logout</button>
+      <p v-if="username">Hello {{username}}</p>
+      <h1>Music</h1>
+      <button @click="toggleAddSong">Add Song</button>
+      <NewSong v-if="addSong"/>
+    </div>
+    <MediaPlayer v-bind:is-admin="isAdmin"/>
   </div>
 </template>
 
@@ -20,6 +22,11 @@ export default {
     return {
       username: '',
       addSong: false
+    }
+  },
+  computed: {
+    isAdmin () {
+      return this.username === 'Admin'
     }
   },
   methods: {
@@ -42,3 +49,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .main-contents {
+    width: 80%;
+    margin: auto 0 auto auto;
+  }
+</style>

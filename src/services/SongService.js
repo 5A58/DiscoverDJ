@@ -6,5 +6,8 @@ export default {
   },
   addSong (song) {
     return Api().post('/songs', song)
+  },
+  deleteSong (id) {
+    return Api().delete('/songs', {id})
   }
 }

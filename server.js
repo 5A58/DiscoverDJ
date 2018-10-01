@@ -66,6 +66,7 @@ io.on("connection", (socket) => {
 });
 
 // Routes
+// Get songs
 app.get("/songs", (req, res) => {
   Song.find({}, (err, allSongs) => {
     if(err) {
@@ -77,6 +78,7 @@ app.get("/songs", (req, res) => {
   });
 });
 
+// Add new song
 app.post('/songs', (req, res) => {
   let title = req.body.title;
   let artist = req.body.artist || '';
@@ -94,6 +96,23 @@ app.post('/songs', (req, res) => {
     }
   });
 });
+
+// Delete song
+app.delete("/songs", (req, res) => {
+  let id = req.body.id;
+  Song.findByIdAndDelete(id, (err) => {
+    if(err) {
+      console.log(err);
+      res.status(400).send(err.message);
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
+
+app.delete('/songs', (req, res) => {
+
+})
 
 app.get('/user/i/:id', (req, res) => {
   User.find({_id: req.params.id}, (err, user) => {
