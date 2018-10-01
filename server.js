@@ -53,6 +53,13 @@ io.on("connection", (socket) => {
     }
   })
 
+  socket.on('queueEnded', (data) => {
+    if (data.room !== null) {
+      console.log(socket.id + ` stopping all players in ${data.room} room`)
+      socket.to(data.room).emit('stopPlayer', '')
+    }
+  })
+
   socket.on('disconnect', () => {
     console.log(socket.id + " Disconnected");
   });

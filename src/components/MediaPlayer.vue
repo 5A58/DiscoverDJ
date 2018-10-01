@@ -53,6 +53,12 @@ export default {
         return null
       }
     },
+    queueEnded: {
+      type: Function,
+      default: () => {
+        return null
+      }
+    },
     DJPage: {
       type: Boolean,
       default: false
@@ -71,6 +77,10 @@ export default {
     pauseVideo () {
       this.playerPaused = true
       this.player.pauseVideo()
+    },
+    stopVideo () {
+      this.playerPaused = true
+      this.player.stopVideo()
     },
     getId (url) {
       return this.$youtube.getIdFromUrl(url)
@@ -159,6 +169,9 @@ export default {
       } else {
         console.log('The song queue is empty')
         this.nothingLoaded = true
+        if (this.DJPage && this.ownPage) {
+          this.queueEnded()
+        }
       }
     },
     addSongToQueue (title, artist, link) {

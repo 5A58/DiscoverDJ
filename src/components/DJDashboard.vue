@@ -3,7 +3,7 @@
       <p v-if="isOwner">Welcome Home</p>
       <p v-else>Welcome to {{ $route.params.username }}'s Dojo</p>
       <div v-if="isOwner">
-        <MediaPlayer ref="player" v-bind="{sendUpdates}" v-bind:DJPage="true"/>
+        <MediaPlayer ref="player" v-bind="{sendUpdates, queueEnded}" v-bind:DJPage="true"/>
       </div>
       <div v-else>
         <MediaPlayer ref="player" v-bind:ownPage="false" v-bind:DJPage="true"/>
@@ -61,6 +61,9 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+    },
+    queueEnded () {
+      this.socket.emit('queueEnded', {room: this.$route.params.username})
     }
   },
   mounted: function () {
@@ -83,6 +86,7 @@ export default {
     })
 
     this.socket.on('updatePlayer', (data) => {
+      if (this.isOwner) return
       console.log('Received update', data)
       let time
       if (data.state === 1) {
@@ -92,6 +96,12 @@ export default {
         time = data.time
       }
       this.$refs['player'].loadSong(data.url, time, data.state)
+    })
+
+    this.socket.on('stopPlayer', (data) => {
+      if (this.isOwner) return
+      console.log('Stopping player')
+      this.$refs['player'].stopVideo()
     })
   }
 }
