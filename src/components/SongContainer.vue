@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="song-container">
       <Song v-for="song in songs" :key="song.id" v-bind:title="song.title"
             v-bind:artist="song.artist" v-bind:link="song.link" v-bind="{songClicked}"/>
     </div>
@@ -13,7 +13,23 @@ export default {
   components: {Song},
   data () {
     return {
-      songs: [],
+      songs: [
+        {id: 1, title: 'Smoke on the Water', artist: 'Deep Purple', link: 'https://www.youtube.com/watch?v=zUwEIt9ez7M'},
+        {id: 2, title: 'Stairway To Heaven', artist: 'Led Zeppelin', link: 'https://www.youtube.com/watch?v=D9ioyEvdggk'},
+        {id: 3, title: 'Simple Man', artist: 'Lynyrd Skynyrd', link: 'https://www.youtube.com/watch?v=sMmTkKz60W8'},
+        {id: 4, title: 'Free Bird', artist: 'Lynyrd Skynyrd', link: 'https://www.youtube.com/watch?v=kgkYN3QjD5M'},
+        {id: 5, title: 'Riders On The Storm', artist: 'The Doors', link: 'https://www.youtube.com/watch?v=iv8GW1GaoIc'},
+        {id: 6, title: 'Smoke on the Water', artist: 'Deep Purple', link: 'https://www.youtube.com/watch?v=zUwEIt9ez7M'},
+        {id: 7, title: 'Stairway To Heaven', artist: 'Led Zeppelin', link: 'https://www.youtube.com/watch?v=D9ioyEvdggk'},
+        {id: 8, title: 'Simple Man', artist: 'Lynyrd Skynyrd', link: 'https://www.youtube.com/watch?v=sMmTkKz60W8'},
+        {id: 9, title: 'Free Bird', artist: 'Lynyrd Skynyrd', link: 'https://www.youtube.com/watch?v=kgkYN3QjD5M'},
+        {id: 10, title: 'Riders On The Storm', artist: 'The Doors', link: 'https://www.youtube.com/watch?v=iv8GW1GaoIc'},
+        {id: 11, title: 'Smoke on the Water', artist: 'Deep Purple', link: 'https://www.youtube.com/watch?v=zUwEIt9ez7M'},
+        {id: 12, title: 'Stairway To Heaven', artist: 'Led Zeppelin', link: 'https://www.youtube.com/watch?v=D9ioyEvdggk'},
+        {id: 13, title: 'Simple Man', artist: 'Lynyrd Skynyrd', link: 'https://www.youtube.com/watch?v=sMmTkKz60W8'},
+        {id: 14, title: 'Free Bird', artist: 'Lynyrd Skynyrd', link: 'https://www.youtube.com/watch?v=kgkYN3QjD5M'},
+        {id: 15, title: 'Riders On The Storm', artist: 'The Doors', link: 'https://www.youtube.com/watch?v=iv8GW1GaoIc'}
+      ],
       data: 'Test'
     }
   },
@@ -31,3 +47,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  #song-container {
+    height: 15rem;
+    overflow: auto;
+    width: 80%;
+    margin: auto 0 auto auto;
+  }
+</style>

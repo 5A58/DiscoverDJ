@@ -1,11 +1,11 @@
 <template>
   <div id="container">
-    <a v-if="!disabled" class="control" @click="handleClick">
-      <font-awesome-icon class="play-icon" v-if="paused" icon="play"/>
+    <a v-if="!disabled" id="control" @click="handleClick">
+      <font-awesome-icon id="play-icon" v-if="paused" icon="play"/>
       <font-awesome-icon v-else icon="pause"/>
     </a>
-    <a v-else class="control-disabled">
-      <font-awesome-icon class="play-icon" v-if="paused" icon="play"/>
+    <a v-else id="control-disabled">
+      <font-awesome-icon id="play-icon" v-if="paused" icon="play"/>
       <font-awesome-icon v-else icon="pause"/>
     </a>
 
@@ -43,7 +43,12 @@ export default {
 </script>
 
 <style scoped>
+  * {
+    box-sizing: content-box;
+  }
+
   #container {
+    z-index: 2;
     margin-top: 0.5em;
     padding: 0.3rem 0;
     height: 1.75rem;
@@ -54,41 +59,41 @@ export default {
     left: 0pt;
   }
 
-  .control svg, .control-disabled svg {
-    height: 0.7em;
-    width: 0.7em;
+  #control svg, #control-disabled svg {
+    height: 0.7rem;
+    width: 0.7rem;
     border: 1px solid #b3b3b3;
-    padding: 0.5em;
+    padding: 0.5rem;
     border-radius: 50%;
   }
 
-  .control-disabled svg {
+  #control-disabled svg {
     color: #535353;
     border: 1px solid #535353;
   }
 
-  .control {
+  #control {
     color: #b3b3b3;
   }
 
-  .control:hover {
+  #control:hover {
     color: #ffffff;
   }
 
-  .control svg:hover {
+  #control svg:hover {
     border: 1px solid #ffffff;
   }
 
-  .control:active {
+  #control:active {
     color: #535353;
   }
 
-  .control svg:active {
+  #control svg:active {
     border: 1px solid #535353;
   }
 
-  .play-icon {
-    padding-left: 0.6em;
-    padding-right: 0.4em;
+  #play-icon {
+    padding-left: 0.6rem;
+    padding-right: 0.4rem;
   }
 </style>

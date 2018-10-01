@@ -12,8 +12,10 @@
 
     <SongContainer v-if="ownPage" v-bind="{songClicked}"/>
 
-    <PlayerControls v-if="ownPage" ref="controls"  v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates}"/>
+    <PlayerControls v-if="ownPage" ref="controls" v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates}"/>
     <PlayerControls v-else ref="controls" v-bind:paused="playerPaused" v-bind:disabled="true"/>
+
+    <SongQueue v-if="ownPage" ref="queue"/>
   </div>
 
 </template>
@@ -23,10 +25,11 @@
 import getYoutubeTitle from 'get-youtube-title'
 import PlayerControls from './PlayerControls'
 import SongContainer from './SongContainer'
+import SongQueue from './SongQueue'
 
 export default {
   name: 'MediaPlayer',
-  components: {SongContainer, PlayerControls},
+  components: {SongQueue, SongContainer, PlayerControls},
   data () {
     return {
       songLink: '',
