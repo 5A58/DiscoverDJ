@@ -55,14 +55,24 @@ io.on("connection", (socket) => {
 
   socket.on('queueEnded', (data) => {
     if (data.room !== null) {
-      console.log(socket.id + ` stopping all players in ${data.room} room`)
+      console.log(socket.id + ` stopping all players in ${data.room}'s room`)
       socket.to(data.room).emit('stopPlayer', '')
+    }
+  })
+
+  socket.on('message', (data) => {
+    if (data.room !== null) {
+      console.log('From', data)
+      console.log(socket.id + ` sending message ${data.message} to ${data.room}'s room`)
+      let author = data.username || 'User ' + socket.id
+      socket.to(data.room).emit('message', {author, message: data.message})
     }
   })
 
   socket.on('disconnect', () => {
     console.log(socket.id + " Disconnected");
   });
+
 });
 
 // Routes

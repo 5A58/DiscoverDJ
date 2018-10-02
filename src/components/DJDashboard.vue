@@ -3,10 +3,10 @@
       <p v-if="isOwner">Welcome Home</p>
       <p v-else>Welcome to {{ $route.params.username }}'s Dojo</p>
       <div v-if="isOwner">
-        <MediaPlayer ref="player" v-bind="{sendUpdates, queueEnded}" v-bind:DJPage="true"/>
+        <MediaPlayer ref="player" v-bind="{sendUpdates, queueEnded, sendMessage}" v-bind:DJPage="true"/>
       </div>
       <div v-else>
-        <MediaPlayer ref="player" v-bind:ownPage="false" v-bind:DJPage="true"/>
+        <MediaPlayer ref="player" v-bind:ownPage="false" v-bind:DJPage="true" v-bind="{sendMessage}"/>
       </div>
     </div>
     <NotFoundComponent v-else></NotFoundComponent>
@@ -64,6 +64,9 @@ export default {
     },
     queueEnded () {
       this.socket.emit('queueEnded', {room: this.$route.params.username})
+    },
+    sendMessage (message) {
+      this.socket.emit('message', {room: this.$route.params.username, username: this.username, message})
     }
   },
   mounted: function () {
@@ -102,6 +105,10 @@ export default {
       if (this.isOwner) return
       console.log('Stopping player')
       this.$refs['player'].stopVideo()
+    })
+
+    this.socket.on('message', (message) => {
+      this.$refs['player'].$refs['messenger'].addMessage(message)
     })
   }
 }

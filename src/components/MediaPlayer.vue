@@ -1,6 +1,6 @@
 <template>
   <div id="player-container">
-    <div id="player-details">
+    <div id="player-details" v-bind:class="{ 'player-details':!DJPage, 'player-details-dj':DJPage }">
       <p v-if="videoId">Now Playing: {{title}}</p>
       <form v-if="ownPage" v-on:submit="submitForm">
         <input v-model="songLink" type="text">
@@ -10,13 +10,14 @@
       <div id="video-container">
         <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube" @ended="videoEnded()"/>
       </div>
-    </div>
 
-    <SongContainer v-if="ownPage" ref="song-container" v-bind:isAdmin="isAdmin" v-bind="{songClicked, addSongToQueue, editSong}"/>
+      <SongContainer v-if="ownPage" ref="song-container" v-bind:isAdmin="isAdmin" v-bind="{songClicked, addSongToQueue, editSong}"/>
+    </div>
 
     <PlayerControls v-if="ownPage" ref="controls" v-bind:disabled="nothingLoaded" v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates, skipSong}"/>
     <PlayerControls v-else ref="controls" v-bind:paused="playerPaused" v-bind:disabled="true"/>
     <SongQueue v-if="ownPage" ref="queue"/>
+    <Messenger ref="messenger" v-if="DJPage" v-bind="{sendMessage}"/>
   </div>
 
 </template>
@@ -26,10 +27,11 @@ import getYoutubeTitle from 'get-youtube-title'
 import PlayerControls from './PlayerControls'
 import SongContainer from './SongContainer'
 import SongQueue from './SongQueue'
+import Messenger from './Messenger'
 
 export default {
   name: 'MediaPlayer',
-  components: {SongQueue, SongContainer, PlayerControls},
+  components: {Messenger, SongQueue, SongContainer, PlayerControls},
   data () {
     return {
       songLink: '',
@@ -61,6 +63,12 @@ export default {
       }
     },
     editSong: {
+      type: Function,
+      default: () => {
+        return null
+      }
+    },
+    sendMessage: {
       type: Function,
       default: () => {
         return null
@@ -205,9 +213,14 @@ export default {
     /*display: none;*/
   }
 
-  #player-details {
+  .player-details {
     width: 80%;
     margin: auto 0 auto auto;
+  }
+
+  .player-details-dj {
+    width: 60%;
+    margin: auto 20% auto auto;
   }
 
 </style>

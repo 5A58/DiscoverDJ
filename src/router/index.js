@@ -18,7 +18,6 @@ const ifNotAuthenticated = (to, from, next) => {
 
 const pageOwnerExists = (to, from, next) => {
   AuthenticationService.getUserID(to.params.username).then(resp => {
-    console.log('The page is owned by', resp.data)
     next()
   }).catch(err => {
     console.log('The page owner does not exist', err)

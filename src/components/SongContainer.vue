@@ -67,7 +67,5 @@ export default {
   #song-container {
     height: 15rem;
     overflow: auto;
-    width: 80%;
-    margin: auto 0 auto auto;
   }
 </style>
