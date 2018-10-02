@@ -1,10 +1,12 @@
 <template>
   <div>
     <div class="main-contents">
-      <a v-if="$store.state.token" v-on:click="logout">Logout</a>
-      <router-link v-else :to="{path: '/login' }">Sign in</router-link>
-      <router-link v-if="username" :to="{path: '/music/' + username}">Host Lobby</router-link>
-      <SongForm v-if="editData" v-bind:editData="editData" v-bind:edit="true" v-bind="{hideForm, getSongId}"/>
+      <div class="header">
+        <router-link v-if="username" :to="{path: '/music/' + username}">Host Lobby</router-link>
+        <a v-if="$store.state.token" v-on:click="logout">Log out</a>
+        <router-link v-else :to="{path: '/login' }">Sign in</router-link>
+      </div>
+      <SongForm v-if="editData" v-bind:editData="editData" v-bind:edit="true" v-bind="{hideForm, getId}"/>
     </div>
     <MediaPlayer ref="media-player" v-bind:is-admin="isAdmin" v-bind="{editSong}"/>
   </div>
@@ -48,7 +50,7 @@ export default {
     editSong (data) {
       this.editData = data
     },
-    getSongId (url) {
+    getId (url) {
       return this.$refs['media-player'].getId(url)
     }
   },
@@ -84,5 +86,28 @@ export default {
 
   .submit:focus {
     outline:0;
+  }
+
+  .header {
+    background: #181818;
+    margin-bottom: -1rem;
+    margin-top: 0.3rem;
+    text-align: right;
+  }
+
+  .header a {
+    cursor:pointer;
+    color: white;
+    margin-right: 1em;
+    font-weight: 500;
+    opacity: 0.7;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+  }
+
+  .header a:hover {
+    color: white;
+    text-decoration: none;
+    opacity: 1;
   }
 </style>

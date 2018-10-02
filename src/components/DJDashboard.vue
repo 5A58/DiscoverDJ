@@ -1,7 +1,5 @@
 <template>
     <div v-if="pageOwned">
-      <p v-if="isOwner">Welcome To Your Stream</p>
-      <p v-else>Welcome to {{ $route.params.username }}'s Stream</p>
       <div v-if="isOwner">
         <MediaPlayer ref="player" v-bind="{sendUpdates, queueEnded, sendMessage}" v-bind:DJPage="true"/>
       </div>

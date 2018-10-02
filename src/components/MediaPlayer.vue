@@ -1,8 +1,18 @@
 <template>
   <div id="player-container">
     <div id="player-details" v-bind:class="{ 'player-details':!DJPage, 'player-details-dj':DJPage }">
-      <p v-if="videoId && DJPage && ownPage" class="now-playing">Now Playing: {{title.length > 55 ? title.substring(0,52) + '...' : title}}</p>
-      <p v-else-if="videoId" class="now-playing">Now Playing: {{title.length > 55 ? title.substring(0,52) + '...' : title}}</p>
+      <div v-if="!videoId && DJPage">
+        <p v-if="ownPage" class="now-playing">Welcome To Your Stream</p>
+        <p v-else class="now-playing">Welcome to {{ $route.params.username }}'s Stream</p>
+      </div>
+      <div v-else-if="videoId">
+        <p v-if="DJPage" class="now-playing">
+          Now Streaming: {{title.length > 55 ? title.substring(0,52) + '...' : title}}
+        </p>
+        <p v-else class="now-playing">
+          Now Playing: {{title.length > 55 ? title.substring(0,52) + '...' : title}}
+        </p>
+      </div>
       <form v-if="ownPage">
         <input v-model="songLink" class="text" type="text" placeholder="YouTube URL" @keyup.enter="submitForm">
         <button style="width: 4rem" class="submit" @click="submitForm">Play</button>
@@ -11,7 +21,7 @@
       </form>
 
       <div id="video-container">
-        <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube" @ended="videoEnded()"/>
+        <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube" @ended="videoEnded()" @ready="playerReady"/>
       </div>
 
       <SongContainer v-if="ownPage" ref="song-container" v-bind:isAdmin="isAdmin" v-bind="{songClicked, addSongToQueue, editSong, renderAddForm}"/>
@@ -97,8 +107,8 @@ export default {
   },
   methods: {
     playVideo () {
-      this.playerPaused = false
       this.player.playVideo()
+      this.playerPaused = false
     },
     pauseVideo () {
       this.playerPaused = true
@@ -106,6 +116,7 @@ export default {
     },
     stopVideo () {
       this.playerPaused = true
+      this.videoId = ''
       this.player.stopVideo()
     },
     getId (url) {
@@ -130,7 +141,7 @@ export default {
         // Song already loaded, check if time changed
         this.player.getCurrentTime().then(resp => {
           if (Math.abs(time - resp) < 5) {
-            // Time is slightly off, perhaps due to latency, so just change state to reduce choppiness
+            // Time may be off, but only slightly, so just change state to reduce choppiness
             if (state === 1) {
               this.playVideo()
             } else {
@@ -153,17 +164,14 @@ export default {
         // Load song
         this.getTitle(id).then(resp => {
           this.error = ''
-          console.log('The title is', resp)
           this.videoURL = url
           this.videoId = id
           this.title = passedTitle || resp
-          console.log('set title', passedTitle)
           if (state !== 1) {
-            this.player.cueVideoById(id, time)
             this.playerPaused = true
+            this.player.loadVideoById(id, time)
           } else {
-            this.player.cueVideoById(id, time)
-            this.playerPaused = false
+            this.player.loadVideoById(id, time)
             this.playVideo()
           }
         }).catch(err => {
@@ -197,6 +205,7 @@ export default {
       } else {
         console.log('The song queue is empty')
         this.nothingLoaded = true
+        this.videoId = ''
         if (this.DJPage && this.ownPage) {
           this.queueEnded()
         }
@@ -234,6 +243,12 @@ export default {
       this.showAddForm = false
       if (data) {
         this.$refs['song-container'].getSongs()
+      }
+    },
+    playerReady () {
+      // Play the video if it tried to play before player was ready
+      if (!this.playerPaused) {
+        this.playVideo()
       }
     }
   }

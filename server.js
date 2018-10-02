@@ -42,14 +42,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on('updateSinglePlayer', (data) => {
-    console.log(socket.id + ` sending state:${data.state}, time:${data.time}, url:${data.url} to ${data.client}`);
-    socket.to(data.client).emit('updatePlayer', {state: data.state, time: data.time, url: data.url});
+    console.log(socket.id + ` sending state:${data.state}, time:${data.time}, url:${data.url} title:${data.title} to ${data.client}`);
+    socket.to(data.client).emit('updatePlayer', {state: data.state, time: data.time, url: data.url, title: data.title});
   })
 
   socket.on('updateAll', (data) => {
     if (data.room !== null) {
-      console.log(socket.id + ` sending state:${data.state}, time:${data.time}, url:${data.url} to all`);
-      socket.to(data.room).emit('updatePlayer', {state: data.state, time: data.time, url: data.url});
+      console.log(socket.id + ` sending state:${data.state}, time:${data.time}, url:${data.url} title: ${data.title} to all`);
+      socket.to(data.room).emit('updatePlayer', {state: data.state, time: data.time, url: data.url, title: data.title});
     }
   })
 
