@@ -1,12 +1,9 @@
 <template>
   <div>
     <div class="main-contents">
-      <button v-if="$store.state.token" v-on:click="logout">Logout</button>
-      <p v-if="username">Hello {{username}}</p>
+      <a v-if="$store.state.token" v-on:click="logout">Logout</a>
+      <router-link v-else :to="{path: '/login' }">Sign in</router-link>
       <router-link v-if="username" :to="{path: '/music/' + username}">Host Lobby</router-link>
-      <!--<h1>Music Player</h1>-->
-      <button class="submit" @click="renderAddForm">Add Song</button>
-      <SongForm v-if="showAddForm" v-bind="{hideForm, getSongId}"/>
       <SongForm v-if="editData" v-bind:editData="editData" v-bind:edit="true" v-bind="{hideForm, getSongId}"/>
     </div>
     <MediaPlayer ref="media-player" v-bind:is-admin="isAdmin" v-bind="{editSong}"/>
@@ -23,7 +20,6 @@ export default {
   data () {
     return {
       username: '',
-      showAddForm: false,
       editData: null
     }
   },
@@ -43,13 +39,9 @@ export default {
         }
       })
     },
-    renderAddForm () {
-      this.showAddForm = true
-    },
     hideForm (data = null) {
-      this.showAddForm = false
       this.editData = null
-      if (data) {
+      if (data !== null) {
         this.$refs['media-player'].$refs['song-container'].getSongs()
       }
     },

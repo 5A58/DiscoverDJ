@@ -37,7 +37,7 @@ export default {
       }
     },
     hideForm: Function,
-    getSongId: Function,
+    getId: Function,
     edit: {
       type: Boolean,
       default: false
@@ -50,7 +50,7 @@ export default {
   methods: {
     submitForm (e) {
       e.preventDefault()
-      let videoId = this.getSongId(this.link)
+      let videoId = this.getId(this.link)
       console.log(typeof videoId)
       if (videoId === null) {
         this.error = 'This is an invalid video Id'
@@ -128,7 +128,7 @@ export default {
 
   .text:focus {
     outline:none;
-    border-color: #fe9001;
+    border-color: #025cc0;
     transition: all 0.2s linear;
   }
 

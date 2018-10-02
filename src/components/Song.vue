@@ -1,5 +1,5 @@
 <template>
-    <div v-on:dblclick="songClicked(link)" @click.ctrl="addSongToQueue(title, artist, link)">
+    <div v-on:dblclick="songClicked(link, title)" @click.ctrl="addSongToQueue(title, artist, link)" @click="renderAddForm">
       {{displayString}}
       <span v-if="isAdmin">
         <span class="edit" @click="editSong({id, title, artist, link})">Edit</span>
@@ -16,11 +16,27 @@ export default {
     title: String,
     artist: String,
     link: String,
-    songClicked: Function,
-    addSongToQueue: Function,
+    songClicked: {
+      type: Function,
+      default: () => {
+        return null
+      }
+    },
+    addSongToQueue: {
+      type: Function,
+      default: () => {
+        return null
+      }
+    },
     isAdmin: {
       type: Boolean,
       default: false
+    },
+    renderAddForm: {
+      type: Function,
+      default: () => {
+        return null
+      }
     },
     editSong: Function,
     deleteSong: Function
@@ -45,7 +61,7 @@ export default {
     color: white;
     background: #181818;
     margin: 0;
-    padding: 1em 0;
+    padding: 1rem 0;
     border-bottom: 1px solid #282828;
     -webkit-user-select: none; /* Chrome/Safari */
     -moz-user-select: none; /* Firefox */

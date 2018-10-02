@@ -1,24 +1,27 @@
 <template>
   <div id="player-container">
     <div id="player-details" v-bind:class="{ 'player-details':!DJPage, 'player-details-dj':DJPage }">
-      <p v-if="videoId">Now Playing: {{title}}</p>
-      <form v-if="ownPage" v-on:submit="submitForm">
-        <input v-model="songLink" class="text" type="text" placeholder="YouTube URL">
+      <p v-if="videoId && DJPage && ownPage" class="now-playing">Now Playing: {{title.length > 55 ? title.substring(0,52) + '...' : title}}</p>
+      <p v-else-if="videoId" class="now-playing">Now Playing: {{title.length > 55 ? title.substring(0,52) + '...' : title}}</p>
+      <form v-if="ownPage">
+        <input v-model="songLink" class="text" type="text" placeholder="YouTube URL" @keyup.enter="submitForm">
         <button style="width: 4rem" class="submit" @click="submitForm">Play</button>
-        <button style="width: 8rem" class="submit">Add to Queue</button>
+        <button style="width: 8rem" class="submit" @click="addLinkToQueue">Add to Queue</button>
+        <p v-if="error" class="error-message">{{error}}</p>
       </form>
 
       <div id="video-container">
         <youtube :player-vars="playerVars" :height="height" :width="width" ref="youtube" @ended="videoEnded()"/>
       </div>
 
-      <SongContainer v-if="ownPage" ref="song-container" v-bind:isAdmin="isAdmin" v-bind="{songClicked, addSongToQueue, editSong}"/>
+      <SongContainer v-if="ownPage" ref="song-container" v-bind:isAdmin="isAdmin" v-bind="{songClicked, addSongToQueue, editSong, renderAddForm}"/>
     </div>
 
     <PlayerControls v-if="ownPage" ref="controls" v-bind:disabled="nothingLoaded" v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates, skipSong}"/>
     <PlayerControls v-else ref="controls" v-bind:paused="playerPaused" v-bind:disabled="true"/>
     <SongQueue v-if="ownPage" ref="queue"/>
     <Messenger ref="messenger" v-if="DJPage" v-bind="{sendMessage}"/>
+    <SongForm v-if="showAddForm" v-bind="{hideForm, getId}"/>
   </div>
 
 </template>
@@ -29,10 +32,11 @@ import PlayerControls from './PlayerControls'
 import SongContainer from './SongContainer'
 import SongQueue from './SongQueue'
 import Messenger from './Messenger'
+import SongForm from './SongForm'
 
 export default {
   name: 'MediaPlayer',
-  components: {Messenger, SongQueue, SongContainer, PlayerControls},
+  components: {SongForm, Messenger, SongQueue, SongContainer, PlayerControls},
   data () {
     return {
       songLink: '',
@@ -44,7 +48,8 @@ export default {
       playerPaused: true,
       nothingLoaded: true,
       error: '',
-      playerVars: {'autoplay': 1, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'showinfo': 0}
+      playerVars: {'autoplay': 1, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'showinfo': 0},
+      showAddForm: false
     }
   },
   props: {
@@ -110,14 +115,14 @@ export default {
       e.preventDefault()
       this.loadSong(this.songLink)
     },
-    async loadSong (url, time = 0, state = 1) {
+    async loadSong (url, time = 0, state = 1, passedTitle = '') {
       this.nothingLoaded = false
       this.playerPaused = true
       console.log('Loading Song')
       let id = this.getId(url)
-      if (id === null) return
+      if (id === null) { this.error = 'This is an invalid YouTube link'; return }
       if (this.DJPage && this.ownPage) {
-        this.sendUpdates(state, url, time)
+        this.sendUpdates(state, url, time, passedTitle)
       }
       // Check if this song is already playing, if it is don't reload, just change state
       if (this.videoURL === url) {
@@ -147,10 +152,12 @@ export default {
       } else {
         // Load song
         this.getTitle(id).then(resp => {
+          this.error = ''
           console.log('The title is', resp)
           this.videoURL = url
           this.videoId = id
-          this.title = resp
+          this.title = passedTitle || resp
+          console.log('set title', passedTitle)
           if (state !== 1) {
             this.player.cueVideoById(id, time)
             this.playerPaused = true
@@ -160,7 +167,8 @@ export default {
             this.playVideo()
           }
         }).catch(err => {
-          console.log('Video not found', err)
+          console.log(err)
+          this.error = 'Video not found'
         })
       }
     },
@@ -175,18 +183,17 @@ export default {
         })
       })
     },
-    songClicked (url) {
-      console.log('Now playing', url)
-      this.loadSong(url)
+    songClicked (url, title) {
+      this.loadSong(url, 0, 1, title)
     },
     getPlayerInfo () {
-      return [this.player.getPlayerState(), this.player.getCurrentTime(), this.videoURL]
+      return [this.player.getPlayerState(), this.player.getCurrentTime(), this.videoURL, this.title]
     },
     videoEnded () {
       let nextSong = this.$refs['queue'].getNext()
       if (nextSong) {
         console.log(`The next song is ${nextSong.link}`)
-        this.loadSong(nextSong.link)
+        this.loadSong(nextSong.link, 0, 1, nextSong.title)
       } else {
         console.log('The song queue is empty')
         this.nothingLoaded = true
@@ -205,6 +212,29 @@ export default {
       this.player.stopVideo()
       this.playerPaused = true
       this.videoEnded()
+    },
+    addLinkToQueue (e) {
+      e.preventDefault()
+      console.log('Add', this.songLink)
+      let id = this.getId(this.songLink)
+      if (id === null) return
+      this.getTitle(id).then(resp => {
+        this.error = ''
+        console.log('The title is', resp)
+        this.$refs['queue'].addSongToQueue(resp, '', this.songLink)
+      }).catch(err => {
+        console.log(err)
+        this.error = 'Video not found'
+      })
+    },
+    renderAddForm () {
+      this.showAddForm = true
+    },
+    hideForm (data = null) {
+      this.showAddForm = false
+      if (data) {
+        this.$refs['song-container'].getSongs()
+      }
     }
   }
 }
@@ -217,12 +247,12 @@ export default {
 
   .player-details {
     width: 80%;
-    margin: auto 0 auto auto;
+    margin: 1rem 0 auto auto;
   }
 
   .player-details-dj {
     width: 60%;
-    margin: auto 20% auto auto;
+    margin: 1rem 20% auto auto;
   }
 
   .text, .submit {
@@ -260,6 +290,18 @@ export default {
 
   .submit:focus {
     outline:0;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 0.8rem;
+    margin: -1rem 0 0.75rem 0.25rem;
+  }
+
+  .now-playing {
+    font-family: 'Srisakdi', cursive;
+    margin: 1rem auto;
+    font-size: 1.75rem;
   }
 
 </style>

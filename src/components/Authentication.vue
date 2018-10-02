@@ -33,22 +33,24 @@ export default {
   methods: {
     submitForm (e) {
       e.preventDefault()
-      if (this.formType === 'Login') {
+      if (this.formType === 'Log in') {
+        if (!this.username || !this.password) { this.error = 'Please fill all fields'; return }
         this.$store.dispatch('login', { username: this.username, password: this.password }).then(resp => {
           this.$router.push('/music')
         }).catch(err => {
           // Login failed
           console.log(err)
-          this.error = err
+          this.error = 'Invalid username or password'
         })
       } else {
+        if (!this.username || !this.password || !this.confirmedPassword) { this.error = 'Please fill all fields'; return }
         if (this.password === this.confirmedPassword) {
           this.$store.dispatch('register', { username: this.username, password: this.password }).then(resp => {
             this.$router.push('/music')
           }).catch(err => {
             // registration failed
             console.log(err)
-            this.error = err
+            this.error = 'Registration currently unavailable'
           })
         } else {
           // passwords do not match
@@ -86,19 +88,19 @@ export default {
 
   .text:focus {
     outline:none;
-    border-color: #025cc0;
+    border-color: #121212;
     transition: all 0.2s linear;
   }
 
   .submit {
     border: none;
-    background: #025cc0;
+    background: #121212;
     color: white;
     padding: 0.5rem 0.3rem 0.5rem 0.3rem;
   }
 
   .submit:hover {
-    background: #024487;
+    background: #040404;
     transition: all 0.2s linear;
   }
 
@@ -114,7 +116,7 @@ export default {
 
   .type {
     text-transform: uppercase;
-    background: #025cc0;
+    background: #121212;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
     font-weight: bold;

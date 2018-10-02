@@ -1,7 +1,7 @@
 <template>
     <div v-if="pageOwned">
-      <p v-if="isOwner">Welcome Home</p>
-      <p v-else>Welcome to {{ $route.params.username }}'s Dojo</p>
+      <p v-if="isOwner">Welcome To Your Stream</p>
+      <p v-else>Welcome to {{ $route.params.username }}'s Stream</p>
       <div v-if="isOwner">
         <MediaPlayer ref="player" v-bind="{sendUpdates, queueEnded, sendMessage}" v-bind:DJPage="true"/>
       </div>
@@ -47,15 +47,16 @@ export default {
       let data = this.$refs['player'].getPlayerInfo()
       let state = await data[0]
       let time = await data[1]
-      return {state, time, url: data[2]}
+      return {state, time, url: data[2], title: data[3]}
     },
-    sendUpdates (state, url, time) {
+    sendUpdates (state, url, time, title) {
       this.getPlayerInfo().then(resp => {
         resp.state = state
         let newUrl = url || resp.url
         resp.url = newUrl
         let newTime = time === 0 ? 0 : resp.time
         resp.time = newTime
+        resp.title = title
         let room = this.$route.params.username || null
         this.socket.emit('updateAll', Object.assign({room}, resp))
       }).catch(err => {
@@ -98,7 +99,7 @@ export default {
       } else {
         time = data.time
       }
-      this.$refs['player'].loadSong(data.url, time, data.state)
+      this.$refs['player'].loadSong(data.url, time, data.state, data.title)
     })
 
     this.socket.on('stopPlayer', (data) => {
