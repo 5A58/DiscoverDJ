@@ -78,13 +78,13 @@ app.get("/songs", (req, res) => {
   });
 });
 
-// Add new song
+// Get all songs
 app.post('/songs', (req, res) => {
   let title = req.body.title;
   let artist = req.body.artist || '';
   let link = req.body.link;
 
-  // Add song to database
+  // Add song
   Song.create({title, artist, link}, (err, newSong) => {
     if (err) {
       console.log(err);
@@ -110,9 +110,23 @@ app.delete("/songs", (req, res) => {
   });
 });
 
-app.delete('/songs', (req, res) => {
+// Edit song
+app.put("/songs", (req, res) => {
+  let title = req.body.title;
+  let artist = req.body.artist || '';
+  let link = req.body.link;
 
-})
+  Song.findByIdAndUpdate(req.body.id, {title, artist, link}, (err, updatedSong) => {
+    if(err) {
+      console.log(err);
+      res.status(400).send(err.message);
+    } else {
+      // Send updated object back
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(updatedSong));
+    }
+  });
+});
 
 app.get('/user/i/:id', (req, res) => {
   User.find({_id: req.params.id}, (err, user) => {

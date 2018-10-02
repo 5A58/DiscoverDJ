@@ -1,8 +1,8 @@
 <template>
     <div v-on:dblclick="songClicked(link)" @click.ctrl="addSongToQueue(title, artist, link)">
-      {{artist ? artist + ' - ' : ''}} {{title}}
+      {{displayString}}
       <span v-if="isAdmin">
-        <span class="edit" @click="editSong(id)">Edit</span>
+        <span class="edit" @click="editSong({id, title, artist, link})">Edit</span>
         <span class="delete" @click="deleteSong(id)">Delete</span>
       </span>
     </div>
@@ -24,6 +24,17 @@ export default {
     },
     editSong: Function,
     deleteSong: Function
+  },
+  computed: {
+    displayString () {
+      if (this.artist) {
+        let a = this.artist.length > 25 ? this.artist.substring(0, 22) + '...' : this.artist
+        let t = this.title.length > 25 ? this.title.substring(0, 22) + '...' : this.title
+        return `${a} - ${t}`
+      } else {
+        return this.title.length > 50 ? this.title.substring(0, 47) + '...' : this.title
+      }
+    }
   }
 }
 </script>

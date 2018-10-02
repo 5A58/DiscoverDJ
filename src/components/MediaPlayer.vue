@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <SongContainer v-if="ownPage" v-bind:isAdmin="isAdmin" v-bind="{songClicked, addSongToQueue}"/>
+    <SongContainer v-if="ownPage" ref="song-container" v-bind:isAdmin="isAdmin" v-bind="{songClicked, addSongToQueue, editSong}"/>
 
     <PlayerControls v-if="ownPage" ref="controls" v-bind:disabled="nothingLoaded" v-bind:paused="playerPaused" v-bind="{playVideo, pauseVideo, sendUpdates, skipSong}"/>
     <PlayerControls v-else ref="controls" v-bind:paused="playerPaused" v-bind:disabled="true"/>
@@ -35,7 +35,7 @@ export default {
       songLink: '',
       title: '',
       height: 400,
-      width: 400,
+      width: 711,
       videoId: '',
       videoURL: '',
       playerPaused: true,
@@ -55,6 +55,12 @@ export default {
       }
     },
     queueEnded: {
+      type: Function,
+      default: () => {
+        return null
+      }
+    },
+    editSong: {
       type: Function,
       default: () => {
         return null

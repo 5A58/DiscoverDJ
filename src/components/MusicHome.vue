@@ -3,25 +3,28 @@
     <div class="main-contents">
       <button v-if="$store.state.token" v-on:click="logout">Logout</button>
       <p v-if="username">Hello {{username}}</p>
+      <router-link v-if="username" :to="{path: '/music/' + username}">Host Lobby</router-link>
       <h1>Music</h1>
-      <button @click="toggleAddSong">Add Song</button>
-      <NewSong v-if="addSong"/>
+      <button @click="renderAddForm">Add Song</button>
+      <SongForm v-if="showAddForm" v-bind="{hideForm, getSongId}"/>
+      <SongForm v-if="editData" v-bind:editData="editData" v-bind:edit="true" v-bind="{hideForm, getSongId}"/>
     </div>
-    <MediaPlayer v-bind:is-admin="isAdmin"/>
+    <MediaPlayer ref="media-player" v-bind:is-admin="isAdmin" v-bind="{editSong}"/>
   </div>
 </template>
 
 <script>
 import SongContainer from './SongContainer'
 import MediaPlayer from './MediaPlayer'
-import NewSong from './NewSong'
+import SongForm from './SongForm'
 export default {
   name: 'MusicHome',
-  components: {NewSong, MediaPlayer, SongContainer},
+  components: {SongForm, MediaPlayer, SongContainer},
   data () {
     return {
       username: '',
-      addSong: false
+      showAddForm: false,
+      editData: null
     }
   },
   computed: {
@@ -40,8 +43,21 @@ export default {
         }
       })
     },
-    toggleAddSong () {
-      this.addSong = !this.addSong
+    renderAddForm () {
+      this.showAddForm = true
+    },
+    hideForm (data = null) {
+      this.showAddForm = false
+      this.editData = null
+      if (data) {
+        this.$refs['media-player'].$refs['song-container'].getSongs()
+      }
+    },
+    editSong (data) {
+      this.editData = data
+    },
+    getSongId (url) {
+      return this.$refs['media-player'].getId(url)
     }
   },
   mounted: function () {
