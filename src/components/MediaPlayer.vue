@@ -3,8 +3,9 @@
     <div id="player-details" v-bind:class="{ 'player-details':!DJPage, 'player-details-dj':DJPage }">
       <p v-if="videoId">Now Playing: {{title}}</p>
       <form v-if="ownPage" v-on:submit="submitForm">
-        <input v-model="songLink" type="text">
-        <button>Submit</button>
+        <input v-model="songLink" class="text" type="text" placeholder="YouTube URL">
+        <button style="width: 4rem" class="submit" @click="submitForm">Play</button>
+        <button style="width: 8rem" class="submit">Add to Queue</button>
       </form>
 
       <div id="video-container">
@@ -42,6 +43,7 @@ export default {
       videoURL: '',
       playerPaused: true,
       nothingLoaded: true,
+      error: '',
       playerVars: {'autoplay': 1, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'showinfo': 0}
     }
   },
@@ -221,6 +223,43 @@ export default {
   .player-details-dj {
     width: 60%;
     margin: auto 20% auto auto;
+  }
+
+  .text, .submit {
+    max-width: 400px;
+    border-radius: 3px;
+  }
+
+  .text {
+    width: 100%;
+    border: 2px solid #dce4ec;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0 0.5rem 0.3rem;
+    font-size: 0.8rem;
+    color: #555;
+  }
+
+  .text:focus {
+    outline:none;
+    border-color: #025cc0;
+    transition: all 0.2s linear;
+  }
+
+  .submit {
+    width: 4rem;
+    border: none;
+    background: #025cc0;
+    color: white;
+    padding: 0.5rem 0.3rem 0.5rem 0.3rem;
+  }
+
+  .submit:hover {
+    background: #024487;
+    transition: all 0.2s linear;
+  }
+
+  .submit:focus {
+    outline:0;
   }
 
 </style>

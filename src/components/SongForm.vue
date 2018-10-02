@@ -129,7 +129,7 @@ export default {
   .text:focus {
     outline:none;
     border-color: #fe9001;
-    transition: all 0.4s linear;
+    transition: all 0.2s linear;
   }
 
   .submit {
@@ -137,12 +137,15 @@ export default {
     background: #121212;
     color: white;
     padding: 0.5rem 0.3rem 0.5rem 0.3rem;
-    /*margin-bottom: 1rem;*/
   }
 
   .submit:hover {
-    background: #141414;
-    transition: all 0.3s linear;
+    background: #040404;
+    transition: all 0.2s linear;
+  }
+
+  .submit:focus {
+    outline:0;
   }
 
   #form-container {

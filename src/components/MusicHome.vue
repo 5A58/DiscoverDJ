@@ -4,8 +4,8 @@
       <button v-if="$store.state.token" v-on:click="logout">Logout</button>
       <p v-if="username">Hello {{username}}</p>
       <router-link v-if="username" :to="{path: '/music/' + username}">Host Lobby</router-link>
-      <h1>Music</h1>
-      <button @click="renderAddForm">Add Song</button>
+      <!--<h1>Music Player</h1>-->
+      <button class="submit" @click="renderAddForm">Add Song</button>
       <SongForm v-if="showAddForm" v-bind="{hideForm, getSongId}"/>
       <SongForm v-if="editData" v-bind:editData="editData" v-bind:edit="true" v-bind="{hideForm, getSongId}"/>
     </div>
@@ -70,5 +70,27 @@ export default {
   .main-contents {
     width: 80%;
     margin: auto 0 auto auto;
+  }
+
+  .submit {
+    width: 6rem;
+    max-width: 400px;
+    border-radius: 3px;
+  }
+
+  .submit {
+    border: none;
+    background: #025cc0;
+    color: white;
+    padding: 0.5rem 0.3rem 0.5rem 0.3rem;
+  }
+
+  .submit:hover {
+    background: #024487;
+    transition: all 0.2s linear;
+  }
+
+  .submit:focus {
+    outline:0;
   }
 </style>
