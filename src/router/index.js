@@ -46,7 +46,7 @@ export default new Router({
     {
       path: '/login',
       component: Authentication,
-      props: {formType: 'Login'},
+      props: {formType: 'Log in'},
       beforeEnter: ifNotAuthenticated
     },
     {
