@@ -8,9 +8,14 @@ let express = require('express'),
     User = require("./models/user"),
     path = require('path'),
     bcrypt = require('bcrypt-nodejs'),
-    serveStatic = require('serve-static'),
-    port = process.env.PORT || 5000;
+    serveStatic = require('serve-static');
 
+// Read environment variables from file instead of host
+if (process.env.NODE_ENV !== 'production') {
+	require('dotenv').config();
+}
+
+const port = process.env.PORT;
 app = express();
 app.use(bodyParser.json());
 app.use(cors());
